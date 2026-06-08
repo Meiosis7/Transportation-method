@@ -179,6 +179,11 @@ function buildControls() {
   });
 
   syncPanel();
+  if (window.innerWidth <= 720) {
+    knowledgePanel.classList.add('collapsed');
+    knowledgeToggle.textContent = '展开知识卡片';
+    knowledgeToggle.setAttribute('aria-expanded', 'false');
+  }
   updatePlayButton();
 }
 
@@ -233,16 +238,19 @@ function draw(time) {
   ctx.clearRect(0, 0, width, height);
   hitAreas.length = 0;
 
+  const isCompact = width <= 980;
   const marginX = Math.max(22, width * 0.055);
   const marginY = Math.max(82, height * 0.13);
-  const sideReserve = width > 980 ? 380 : 160;
-  const usableW = width - marginX * 2 - sideReserve * 0.55;
-  const usableH = height - marginY * 2.08;
-  const scale = Math.min(usableW / 920, usableH / 620);
+  const sideReserve = isCompact ? 0 : 380;
+  const usableW = isCompact ? width - 28 : width - marginX * 2 - sideReserve * 0.55;
+  const usableH = isCompact ? height - 250 : height - marginY * 2.08;
+  const scale = isCompact
+    ? Math.min(usableW / 780, usableH / 700)
+    : Math.min(usableW / 920, usableH / 620);
 
   sceneBox = {
-    x: width > 980 ? marginX : width / 2 - 460 * scale,
-    y: height / 2 - 302 * scale + 22,
+    x: isCompact ? width / 2 - 460 * scale : marginX,
+    y: isCompact ? Math.max(172, height * 0.18) : height / 2 - 302 * scale + 22,
     scale,
   };
 
