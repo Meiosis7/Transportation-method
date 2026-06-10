@@ -253,13 +253,13 @@ function draw(time) {
   const isCompact = width <= 980;
   const marginX = Math.max(22, width * 0.055);
   const usableW = isCompact ? width - 20 : width - marginX * 2;
-  const desktopTop = 210;
-  const desktopBottom = 238;
+  const desktopTop = 214;
+  const desktopBottom = 218;
   const usableH = isCompact ? height - 320 : Math.max(360, height - desktopTop - desktopBottom);
   const scale = isCompact
     ? Math.min(usableW / 720, usableH / 610)
-    : Math.min(0.96, usableW / 940, usableH / 620);
-  const desktopSceneY = desktopTop + Math.max(0, (usableH - 620 * scale) * 0.38);
+    : Math.min(1.18, usableW / 900, usableH / 620);
+  const desktopSceneY = desktopTop + Math.max(0, (usableH - 620 * scale) * 0.28);
 
   sceneBox = {
     x: isCompact ? width / 2 - 405 * scale : width / 2 - 405 * scale,
