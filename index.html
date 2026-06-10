@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>物质跨膜运输方式交互动态模型</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260610103126" />
   </head>
   <body>
     <main class="app">
@@ -19,23 +19,23 @@
           <div class="status" id="status">自由扩散</div>
         </header>
 
+        <nav class="controls floating-panel" aria-label="动画控制">
+          <button id="playBtn" type="button" aria-pressed="true">暂停</button>
+          <div class="timeline" id="timeline"></div>
+          <button id="compareBtn" type="button">运输方式对比</button>
+          <button id="proteinBtn" type="button">转运蛋白对比</button>
+          <button id="resetBtn" type="button">重播</button>
+        </nav>
+        <button id="phosphoBtn" class="phospho-control floating-panel" type="button" aria-pressed="false" hidden>
+          磷酸化过程
+        </button>
+
         <aside class="side floating-panel" id="knowledgePanel">
-          <button class="knowledge-toggle" id="knowledgeToggle" type="button" aria-expanded="true">收起知识卡片</button>
           <div class="knowledge-body">
-            <div class="section-title">当前方式</div>
-            <h2 id="modeTitle">自由扩散</h2>
-            <p id="modeText">小分子或脂溶性物质直接穿过磷脂双分子层，从高浓度一侧向低浓度一侧扩散。</p>
-
-            <div class="structure">
-              <span class="dot" id="structureDot"></span>
-              <div>
-                <div class="muted">动画重点</div>
-                <strong id="focusName">不需要转运蛋白</strong>
-              </div>
-            </div>
-
-            <div class="info" id="infoText">
-              点击膜上的结构或左右两侧浓度区，可以查看浓度梯度、转运蛋白和能量消耗说明。
+            <div class="mode-summary">
+              <div class="section-title">当前方式</div>
+              <h2 id="modeTitle">自由扩散</h2>
+              <p id="modeText">小分子或脂溶性物质直接穿过磷脂双分子层，从高浓度一侧向低浓度一侧扩散。</p>
             </div>
 
             <div class="facts" aria-label="核心比较">
@@ -43,10 +43,16 @@
               <div><span>转运蛋白</span><b id="proteinFact">不需要</b></div>
               <div><span>蛋白种类</span><b id="typeFact">无</b></div>
               <div><span>能量消耗</span><b id="energyFact">不消耗 ATP</b></div>
-              <div><span>运输实例</span><b id="exampleFact">小部分水；小分子脂溶性物质</b></div>
+              <div><span>运输实例</span><b id="exampleFact">气体分子；小部分水；小分子脂溶性物质</b></div>
             </div>
           </div>
         </aside>
+
+        <div class="floating-info floating-panel" id="infoCard" hidden>
+          <button id="closeInfoBtn" type="button" aria-label="关闭说明">×</button>
+          <div class="section-title" id="infoCardTitle">说明</div>
+          <p id="infoText">点击膜上的结构或左右两侧浓度区，可以查看浓度梯度、转运蛋白和能量消耗说明。</p>
+        </div>
 
         <section class="compare-panel floating-panel" id="comparePanel" aria-label="三种运输方式对比" hidden>
           <div class="compare-head">
@@ -58,39 +64,35 @@
           </div>
           <div class="compare-table" role="table" aria-label="三种跨膜运输方式列表比较">
             <div class="compare-row compare-header" role="row">
-              <span>比较项目</span>
-              <span>自由扩散</span>
-              <span>协助扩散</span>
-              <span>主动运输</span>
-            </div>
-            <div class="compare-row" role="row">
+              <span>运输方式</span>
               <span>浓度梯度</span>
-              <span>顺浓度梯度</span>
-              <span>顺浓度梯度</span>
-              <span>逆浓度梯度</span>
-            </div>
-            <div class="compare-row" role="row">
               <span>转运蛋白</span>
-              <span>不需要</span>
-              <span>需要</span>
-              <span>需要</span>
-            </div>
-            <div class="compare-row" role="row">
               <span>蛋白种类</span>
-              <span>无</span>
-              <span>通道蛋白 / 载体蛋白</span>
-              <span>载体蛋白</span>
-            </div>
-            <div class="compare-row" role="row">
               <span>能量消耗</span>
-              <span>不消耗 ATP</span>
-              <span>不消耗 ATP</span>
-              <span>消耗 ATP</span>
+              <span>运输实例</span>
             </div>
             <div class="compare-row" role="row">
-              <span>运输实例</span>
-              <span>小部分水；小分子脂溶性物质：甘油、乙醇、苯、胆固醇、性激素</span>
-              <span>葡萄糖进入多数组织细胞；水通道；Na+、K+、Ca2+、Cl- 离子通道</span>
+              <span>自由扩散</span>
+              <span>顺浓度梯度</span>
+              <span>不需要</span>
+              <span>无</span>
+              <span>不消耗 ATP</span>
+              <span>气体分子：O₂、CO₂、N₂；小部分水；小分子脂溶性物质：甘油、乙醇、苯、胆固醇、性激素</span>
+            </div>
+            <div class="compare-row" role="row">
+              <span>协助扩散</span>
+              <span>顺浓度梯度</span>
+              <span>需要</span>
+              <span>通道蛋白 / 载体蛋白</span>
+              <span>不消耗 ATP</span>
+              <span>葡萄糖进入多数组织细胞；水通道；Na⁺、K⁺、Ca²⁺、Cl⁻ 离子通道</span>
+            </div>
+            <div class="compare-row" role="row">
+              <span>主动运输</span>
+              <span>逆浓度梯度</span>
+              <span>需要</span>
+              <span>载体蛋白</span>
+              <span>消耗 ATP</span>
               <span>植物根吸收无机盐离子；钠钾泵吸钾排钠；小肠、肾小管上皮细胞吸葡萄糖</span>
             </div>
           </div>
@@ -123,16 +125,9 @@
           <div class="protein-common">共同点：均为蛋白质；均分布在细胞膜结构中；均控制特定物质跨膜运输，具有特异性。</div>
         </section>
 
-        <nav class="controls floating-panel" aria-label="动画控制">
-          <button id="playBtn" type="button" aria-pressed="true">暂停</button>
-          <div class="timeline" id="timeline"></div>
-          <button id="compareBtn" type="button">运输方式对比</button>
-          <button id="proteinBtn" type="button">转运蛋白对比</button>
-          <button id="resetBtn" type="button">重播</button>
-        </nav>
       </section>
     </main>
 
-    <script type="module" src="./src/app.js"></script>
+    <script type="module" src="./src/app.js?v=20260610103126"></script>
   </body>
 </html>
