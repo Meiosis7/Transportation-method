@@ -428,6 +428,10 @@ h2 {
 
 .mini-scene {
   position: relative;
+  --mini-channel-left: 40px;
+  --mini-channel-center-offset: 14px;
+  --mini-assisted-carrier-right: 34px;
+  --mini-assisted-carrier-center-offset: 24px;
   height: 112px;
   overflow: hidden;
   border: 2px solid rgba(32, 50, 74, 0.16);
@@ -489,13 +493,13 @@ h2 {
 }
 
 .mini-dot.assisted-channel-flow {
-  left: 54px;
+  left: calc(var(--mini-channel-left) + var(--mini-channel-center-offset));
   background: #21bda8;
   animation-name: miniAssistDown;
 }
 
 .mini-dot.assisted-carrier-flow {
-  left: calc(100% - 58px);
+  left: calc(100% - var(--mini-assisted-carrier-right) - var(--mini-assisted-carrier-center-offset));
   background: #21bda8;
   animation-name: miniCarrierDown;
 }
@@ -517,7 +521,7 @@ h2 {
 
 .mini-channel {
   position: absolute;
-  left: 40px;
+  left: var(--mini-channel-left);
   top: 28px;
   width: 28px;
   height: 62px;
@@ -562,7 +566,7 @@ h2 {
 }
 
 .mini-carrier.assisted {
-  right: 34px;
+  right: var(--mini-assisted-carrier-right);
 }
 
 .mini-carrier.active {
@@ -1691,6 +1695,10 @@ h1 {
   }
 
   .mini-scene {
+    --mini-channel-left: 16%;
+    --mini-channel-center-offset: 10px;
+    --mini-assisted-carrier-right: 9%;
+    --mini-assisted-carrier-center-offset: 17px;
     height: clamp(48px, 17vw, 68px);
     border-width: 2px;
   }
@@ -1711,7 +1719,6 @@ h1 {
   }
 
   .mini-channel {
-    left: 16%;
     top: 22%;
     width: 20px;
     height: 56%;
@@ -1727,7 +1734,7 @@ h1 {
   }
 
   .mini-carrier.assisted {
-    right: 9%;
+    right: var(--mini-assisted-carrier-right);
   }
 
   .mini-carrier::before,
