@@ -146,22 +146,37 @@
             </div>
             <button id="closeProteinBtn" type="button" aria-label="关闭蛋白对比界面">关闭</button>
           </div>
-          <div class="protein-compare">
-            <div class="protein-col">
-              <h3>通道蛋白</h3>
-              <p><b>参与方式：</b>协助扩散</p>
-              <p><b>与分子关系：</b>不与被运输分子结合</p>
-              <p><b>选择机制：</b>通道直径、形状和电荷相适宜</p>
-              <p><b>自身构象：</b>通常不因结合被运输分子而改变，仅由电压、配体、机械力等门控信号触发构象改变</p>
-            </div>
-            <div class="protein-col">
-              <h3>载体蛋白</h3>
-              <p><b>参与方式：</b>协助扩散或主动运输</p>
-              <p><b>与分子关系：</b>与被运输分子结合</p>
-              <p><b>选择机制：</b>结合部位与特定分子或离子相适应</p>
-              <p><b>自身构象：</b>运输过程中会发生构象改变</p>
-            </div>
-          </div>
+          <table class="protein-table" aria-label="通道蛋白和载体蛋白对比表">
+            <thead>
+              <tr>
+                <th scope="col">比较项目</th>
+                <th scope="col">通道蛋白</th>
+                <th scope="col">载体蛋白</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">参与方式</th>
+                <td>协助扩散</td>
+                <td>协助扩散或主动运输</td>
+              </tr>
+              <tr>
+                <th scope="row">与分子关系</th>
+                <td>不与被运输分子结合</td>
+                <td>与被运输分子结合</td>
+              </tr>
+              <tr>
+                <th scope="row">选择机制</th>
+                <td>通道直径、形状和电荷相适宜</td>
+                <td>结合部位与特定分子或离子相适应</td>
+              </tr>
+              <tr>
+                <th scope="row">自身构象</th>
+                <td>通常不因结合被运输分子而改变，仅由电压、配体、机械力等门控信号触发构象改变</td>
+                <td>运输过程中会发生构象改变</td>
+              </tr>
+            </tbody>
+          </table>
           <div class="protein-common">共同点：均为蛋白质；均分布在细胞膜结构中；均控制特定物质跨膜运输，具有特异性。</div>
         </section>
 
