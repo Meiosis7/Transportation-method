@@ -479,7 +479,7 @@ h2 {
 .mini-dot.assisted-carrier-flow,
 .mini-dot.active-flow {
   left: 50%;
-  top: 18px;
+  top: 8px;
   z-index: 4;
   transform: translate(-50%, 0);
   animation-duration: 2.7s;
@@ -673,15 +673,22 @@ h2 {
 @keyframes miniFreeDown {
   0% {
     opacity: 0;
-    transform: translate(-50%, 0) scale(0.78);
+    transform: translate(-50%, -12px) scale(0.74);
   }
-  18% {
+  8% {
     opacity: 1;
+    transform: translate(-50%, -12px) scale(0.86);
   }
-  52% {
+  26% {
+    transform: translate(-50%, -12px) scale(0.9);
+  }
+  42% {
+    transform: translate(-50%, 18px) scale(0.96);
+  }
+  58% {
     transform: translate(-50%, 44px) scale(1);
   }
-  88% {
+  90% {
     opacity: 1;
     transform: translate(-50%, 82px) scale(1);
   }
@@ -694,22 +701,25 @@ h2 {
 @keyframes miniAssistDown {
   0% {
     opacity: 0;
-    transform: translate(-50%, -8px) scale(0.78);
+    transform: translate(-50%, -14px) scale(0.74);
   }
-  18% {
+  8% {
     opacity: 1;
-    transform: translate(-50%, 6px) scale(0.92);
+    transform: translate(-50%, -14px) scale(0.86);
   }
-  38% {
-    transform: translate(-50%, 26px) scale(0.78);
+  28% {
+    transform: translate(-50%, -14px) scale(0.9);
   }
-  50% {
+  44% {
+    transform: translate(-50%, 20px) scale(0.78);
+  }
+  58% {
     transform: translate(-50%, 43px) scale(0.72);
   }
-  68% {
+  74% {
     transform: translate(-50%, 62px) scale(0.84);
   }
-  88% {
+  90% {
     opacity: 1;
     transform: translate(-50%, 84px) scale(1);
   }
@@ -722,22 +732,25 @@ h2 {
 @keyframes miniCarrierDown {
   0% {
     opacity: 0;
-    transform: translate(-50%, -8px) scale(0.78);
+    transform: translate(-50%, -14px) scale(0.74);
   }
-  18% {
+  8% {
     opacity: 1;
-    transform: translate(-50%, 8px) scale(0.96);
+    transform: translate(-50%, -14px) scale(0.86);
   }
-  38% {
-    transform: translate(-50%, 26px) scale(0.74);
+  28% {
+    transform: translate(-50%, -14px) scale(0.9);
   }
-  58% {
+  44% {
+    transform: translate(-50%, 20px) scale(0.74);
+  }
+  62% {
     transform: translate(-50%, 48px) scale(0.68);
   }
-  70% {
+  76% {
     transform: translate(-50%, 62px) scale(0.82);
   }
-  86% {
+  90% {
     opacity: 1;
     transform: translate(-50%, 84px) scale(1);
   }
