@@ -495,7 +495,7 @@ h2 {
 }
 
 .mini-dot.assisted-carrier-flow {
-  left: calc(100% - 60px);
+  left: calc(100% - 58px);
   background: #21bda8;
   animation-name: miniCarrierDown;
 }
@@ -690,46 +690,56 @@ h2 {
 @keyframes miniAssistDown {
   0% {
     opacity: 0;
-    transform: translate(-50%, -2px) scale(0.8);
+    transform: translate(-50%, -8px) scale(0.78);
   }
   18% {
     opacity: 1;
+    transform: translate(-50%, 6px) scale(0.92);
+  }
+  38% {
+    transform: translate(-50%, 26px) scale(0.78);
   }
   50% {
-    transform: translate(-50%, 43px) scale(0.96);
+    transform: translate(-50%, 43px) scale(0.72);
+  }
+  68% {
+    transform: translate(-50%, 62px) scale(0.84);
   }
   88% {
     opacity: 1;
-    transform: translate(-50%, 82px) scale(1);
+    transform: translate(-50%, 84px) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, 92px) scale(0.78);
+    transform: translate(-50%, 96px) scale(0.78);
   }
 }
 
 @keyframes miniCarrierDown {
   0% {
     opacity: 0;
-    transform: translate(-50%, -2px) scale(0.78);
+    transform: translate(-50%, -8px) scale(0.78);
   }
   18% {
     opacity: 1;
-    transform: translate(-50%, 10px) scale(0.95);
+    transform: translate(-50%, 8px) scale(0.96);
   }
   38% {
-    transform: translate(-50%, 28px) scale(0.72);
+    transform: translate(-50%, 26px) scale(0.74);
   }
   58% {
-    transform: translate(-50%, 46px) scale(0.72);
+    transform: translate(-50%, 48px) scale(0.68);
+  }
+  70% {
+    transform: translate(-50%, 62px) scale(0.82);
   }
   86% {
     opacity: 1;
-    transform: translate(-50%, 78px) scale(1);
+    transform: translate(-50%, 84px) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, 92px) scale(0.78);
+    transform: translate(-50%, 96px) scale(0.78);
   }
 }
 
