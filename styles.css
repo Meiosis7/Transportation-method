@@ -868,14 +868,26 @@ h2 {
   z-index: 4;
 }
 
+.protein-table-wrap {
+  overflow: auto;
+  border: 1px solid rgba(43, 69, 91, 0.13);
+  border-radius: 8px;
+  background: rgba(250, 253, 253, 0.88);
+}
+
 .protein-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  border: 1px solid rgba(43, 69, 91, 0.13);
-  border-radius: 8px;
-  background: rgba(250, 253, 253, 0.88);
   table-layout: fixed;
+}
+
+.protein-topic-col {
+  width: 124px;
+}
+
+.protein-type-col {
+  width: calc((100% - 124px) / 2);
 }
 
 .protein-table th,
@@ -900,17 +912,6 @@ h2 {
   color: #1f2f46;
   font-weight: 840;
   background: #dff7ff;
-}
-
-.protein-table th:first-child {
-  width: 124px;
-}
-
-.protein-table th:nth-child(2),
-.protein-table th:nth-child(3),
-.protein-table td:nth-child(2),
-.protein-table td:nth-child(3) {
-  width: calc((100% - 124px) / 2);
 }
 
 .protein-table tbody th {
@@ -1655,30 +1656,104 @@ h1 {
   }
 
   .compare-visuals {
-    grid-template-columns: repeat(3, minmax(clamp(78px, 27vw, 180px), 1fr));
-    gap: clamp(5px, 1.8vw, 8px);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(4px, 1.4vw, 7px);
     padding-bottom: 4px;
-    overflow-x: auto;
+    overflow: visible;
   }
 
   .mini-transport {
-    padding: clamp(6px, 2vw, 9px);
+    padding: clamp(5px, 1.5vw, 8px);
+    border-width: 2px;
   }
 
   .mini-transport h3 {
-    margin: 0 0 5px;
-    font-size: clamp(11px, 3.2vw, 14px);
+    margin: 0 0 4px;
+    font-size: clamp(10px, 2.9vw, 13px);
+    line-height: 1.1;
     text-align: center;
   }
 
   .mini-transport p {
-    margin: 6px 0 0;
-    font-size: clamp(9.5px, 2.7vw, 11.5px);
-    line-height: 1.35;
+    margin: 5px 0 0;
+    font-size: clamp(8.5px, 2.35vw, 10.5px);
+    line-height: 1.28;
   }
 
   .mini-scene {
-    height: clamp(66px, 22vw, 82px);
+    height: clamp(48px, 17vw, 68px);
+    border-width: 2px;
+  }
+
+  .mini-membrane {
+    left: 7px;
+    right: 7px;
+    top: 46%;
+    height: 10px;
+    border-top-width: 4px;
+    border-bottom-width: 4px;
+  }
+
+  .mini-dot {
+    width: 9px;
+    height: 9px;
+    border-width: 2px;
+  }
+
+  .mini-channel {
+    left: 16%;
+    top: 22%;
+    width: 20px;
+    height: 56%;
+    border-width: 3px;
+    box-shadow: inset 0 0 0 5px #e9f7ff;
+  }
+
+  .mini-carrier {
+    right: 12%;
+    top: 18%;
+    width: 34px;
+    height: 64%;
+  }
+
+  .mini-carrier.assisted {
+    right: 9%;
+  }
+
+  .mini-carrier::before,
+  .mini-carrier::after {
+    width: 19px;
+    height: 100%;
+    border-width: 3px;
+  }
+
+  .mini-atp {
+    left: calc(50% + 18px);
+    top: 50%;
+    min-width: 28px;
+    padding: 2px 3px;
+    border-width: 2px;
+    font-size: 9px;
+  }
+
+  .mini-arrow {
+    width: 4px;
+    height: 70%;
+  }
+
+  .mini-arrow.down {
+    top: 9%;
+  }
+
+  .mini-arrow.up {
+    bottom: 9%;
+  }
+
+  .mini-arrow::after {
+    width: 12px;
+    height: 12px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
   }
 
   .compare-table {
@@ -1730,54 +1805,51 @@ h1 {
     z-index: 3;
   }
 
-  .protein-table,
-  .protein-table thead,
-  .protein-table tbody,
-  .protein-table tr,
-  .protein-table th,
-  .protein-table td {
-    display: revert;
+  .protein-table-wrap {
+    overflow-x: auto;
+    border: 2px solid rgba(32, 50, 74, 0.18);
+    border-radius: 8px;
   }
 
   .protein-table {
-    display: table;
     width: 100%;
-    min-width: 620px;
+    min-width: 0;
     border: 2px solid rgba(32, 50, 74, 0.18);
     background: rgba(250, 253, 253, 0.88);
     table-layout: fixed;
   }
 
-  .protein-table thead {
-    display: table-header-group;
+  .protein-topic-col {
+    width: 86px;
   }
 
-  .protein-table tbody {
-    display: table-row-group;
-  }
-
-  .protein-table tr {
-    display: table-row;
-    margin-bottom: 0;
-    border: 0;
-    border-radius: 0;
+  .protein-type-col {
+    width: calc((100% - 86px) / 2);
   }
 
   .protein-table tbody th {
-    display: table-cell;
-    width: 108px;
-    padding: 9px 10px;
+    width: 86px;
+    padding: 8px 7px;
     border-right: 1px solid rgba(43, 69, 91, 0.12);
     color: #1f2f46;
-    font-size: 12px;
+    font-size: 11.5px;
+    line-height: 1.32;
     background: #dff7ff;
   }
 
+  .protein-table th,
   .protein-table td {
-    padding: 8px 10px;
+    padding: 8px 7px;
     border-right: 1px solid rgba(43, 69, 91, 0.12);
+    font-size: 11.5px;
+    line-height: 1.34;
+    word-break: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .protein-table thead th {
     font-size: 12px;
-    line-height: 1.42;
+    line-height: 1.24;
   }
 
   .protein-panel {
