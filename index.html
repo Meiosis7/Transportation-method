@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>物质跨膜运输方式交互动态模型</title>
-    <link rel="stylesheet" href="./styles.css?v=20260610112436" />
+    <link rel="stylesheet" href="./styles.css?v=20260611120000" />
   </head>
   <body>
     <main class="app">
@@ -61,6 +61,46 @@
               <h2>运输方式对比</h2>
             </div>
             <button id="closeCompareBtn" type="button" aria-label="关闭对比界面">关闭</button>
+          </div>
+          <div class="compare-visuals" aria-label="三种运输方式同步动画">
+            <div class="mini-transport">
+              <h3>自由扩散</h3>
+              <div class="mini-scene" aria-hidden="true">
+                <div class="mini-membrane"></div>
+                <div class="mini-arrow down"></div>
+                <i class="mini-dot free-flow f1"></i>
+                <i class="mini-dot free-flow f2"></i>
+                <i class="mini-dot free-flow f3"></i>
+              </div>
+              <p>不经过转运蛋白，顺浓度梯度直接穿膜。</p>
+            </div>
+            <div class="mini-transport">
+              <h3>协助扩散</h3>
+              <div class="mini-scene" aria-hidden="true">
+                <div class="mini-membrane"></div>
+                <div class="mini-channel"></div>
+                <div class="mini-carrier assisted"></div>
+                <div class="mini-arrow down assisted-arrow"></div>
+                <i class="mini-dot assisted-channel-flow f1"></i>
+                <i class="mini-dot assisted-channel-flow f2"></i>
+                <i class="mini-dot assisted-carrier-flow f1"></i>
+                <i class="mini-dot assisted-carrier-flow f3"></i>
+              </div>
+              <p>借助通道蛋白或载体蛋白，仍顺浓度梯度。</p>
+            </div>
+            <div class="mini-transport">
+              <h3>主动运输</h3>
+              <div class="mini-scene active-mini-scene" aria-hidden="true">
+                <div class="mini-membrane"></div>
+                <div class="mini-carrier active"></div>
+                <div class="mini-arrow up"></div>
+                <div class="mini-atp">ATP</div>
+                <i class="mini-dot active-flow f1"></i>
+                <i class="mini-dot active-flow f2"></i>
+                <i class="mini-dot active-flow f3"></i>
+              </div>
+              <p>消耗 ATP，经载体蛋白逆浓度梯度运输。</p>
+            </div>
           </div>
           <div class="compare-table" role="table" aria-label="三种跨膜运输方式列表比较">
             <div class="compare-row compare-header" role="row">
@@ -128,6 +168,6 @@
       </section>
     </main>
 
-    <script type="module" src="./src/app.js?v=20260610112436"></script>
+    <script src="./src/app.js?v=20260611120000"></script>
   </body>
 </html>

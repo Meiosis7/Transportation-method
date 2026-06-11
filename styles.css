@@ -339,7 +339,7 @@ h2 {
   z-index: 7;
   padding: 18px;
   border-radius: 8px;
-  max-height: calc(100vh - 430px);
+  max-height: calc(100vh - 220px);
   overflow: auto;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(246, 252, 251, 0.93)),
@@ -468,9 +468,54 @@ h2 {
   top: 24px;
 }
 
+.mini-dot.free-flow,
+.mini-dot.assisted-channel-flow,
+.mini-dot.assisted-carrier-flow,
+.mini-dot.active-flow {
+  left: 50%;
+  top: 18px;
+  z-index: 4;
+  transform: translate(-50%, 0);
+  animation-duration: 2.7s;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.mini-dot.free-flow {
+  background: #3f8cff;
+  animation-name: miniFreeDown;
+}
+
+.mini-dot.assisted-channel-flow {
+  left: 54px;
+  background: #21bda8;
+  animation-name: miniAssistDown;
+}
+
+.mini-dot.assisted-carrier-flow {
+  left: calc(100% - 60px);
+  background: #21bda8;
+  animation-name: miniCarrierDown;
+}
+
+.mini-dot.active-flow {
+  left: 50%;
+  top: 82px;
+  background: #ee5d83;
+  animation-name: miniActiveUp;
+}
+
+.mini-dot.f2 {
+  animation-delay: 0.9s;
+}
+
+.mini-dot.f3 {
+  animation-delay: 1.8s;
+}
+
 .mini-channel {
   position: absolute;
-  left: 58px;
+  left: 40px;
   top: 28px;
   width: 28px;
   height: 62px;
@@ -484,32 +529,79 @@ h2 {
   position: absolute;
   right: 48px;
   top: 24px;
-  width: 42px;
+  width: 48px;
   height: 70px;
-  border: 4px solid #20324a;
-  border-radius: 22px 22px 10px 10px;
-  background: #21bda8;
+  background: transparent;
+  z-index: 3;
 }
 
+.mini-carrier::before,
 .mini-carrier::after {
   content: "";
   position: absolute;
-  left: 15px;
-  top: -6px;
-  width: 6px;
-  height: 78px;
-  border-radius: 999px;
-  background: #20324a;
+  top: 0;
+  width: 27px;
+  height: 70px;
+  border: 4px solid #20324a;
+  background: #21bda8;
+  box-sizing: border-box;
+}
+
+.mini-carrier::before {
+  left: 0;
+  border-radius: 22px 8px 8px 22px;
+  transform-origin: 100% 50%;
+}
+
+.mini-carrier::after {
+  right: 0;
+  border-radius: 8px 22px 22px 8px;
+  transform-origin: 0 50%;
+}
+
+.mini-carrier.assisted {
+  right: 34px;
 }
 
 .mini-carrier.active {
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
+}
+
+.mini-carrier.assisted::before,
+.mini-carrier.assisted::after,
+.mini-carrier.active::before,
+.mini-carrier.active::after {
+  animation-duration: 2.7s;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+}
+
+.mini-carrier.assisted::before,
+.mini-carrier.assisted::after {
+  background: #21bda8;
+}
+
+.mini-carrier.active::before,
+.mini-carrier.active::after {
   background: #ee5d83;
+}
+
+.mini-carrier.assisted::before,
+.mini-carrier.active::before {
+  animation-name: miniActiveCarrierLeft;
+}
+
+.mini-carrier.assisted::after,
+.mini-carrier.active::after {
+  animation-name: miniActiveCarrierRight;
 }
 
 .mini-atp {
   position: absolute;
-  right: 12px;
-  bottom: 13px;
+  left: calc(50% + 32px);
+  top: 58px;
   min-width: 38px;
   padding: 4px 5px;
   border: 2px solid #20324a;
@@ -519,37 +611,46 @@ h2 {
   font-size: 11px;
   font-weight: 900;
   text-align: center;
+  animation: miniAtpPulse 1.35s ease-in-out infinite;
 }
 
 .mini-arrow {
   position: absolute;
   left: 50%;
-  width: 4px;
-  height: 70px;
+  z-index: 2;
+  width: 6px;
+  height: 82px;
   transform: translateX(-50%);
   border-radius: 999px;
   background: #3f8cff;
   color: #3f8cff;
+  box-shadow: 0 0 0 3px rgba(63, 140, 255, 0.18);
 }
 
 .mini-arrow.down {
-  top: 18px;
+  top: 12px;
+}
+
+.mini-arrow.assisted-arrow {
+  background: #3f8cff;
+  color: #3f8cff;
 }
 
 .mini-arrow.up {
-  bottom: 18px;
+  bottom: 10px;
   background: #ee5d83;
   color: #ee5d83;
+  box-shadow: 0 0 0 3px rgba(238, 93, 131, 0.18);
 }
 
 .mini-arrow::after {
   content: "";
   position: absolute;
   left: 50%;
-  width: 14px;
-  height: 14px;
-  border-right: 4px solid currentColor;
-  border-bottom: 4px solid currentColor;
+  width: 18px;
+  height: 18px;
+  border-right: 6px solid currentColor;
+  border-bottom: 6px solid currentColor;
   color: inherit;
 }
 
@@ -561,6 +662,158 @@ h2 {
 .mini-arrow.up::after {
   top: -2px;
   transform: translateX(-50%) rotate(225deg);
+}
+
+@keyframes miniFreeDown {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.78);
+  }
+  18% {
+    opacity: 1;
+  }
+  52% {
+    transform: translate(-50%, 44px) scale(1);
+  }
+  88% {
+    opacity: 1;
+    transform: translate(-50%, 82px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 92px) scale(0.78);
+  }
+}
+
+@keyframes miniAssistDown {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -2px) scale(0.8);
+  }
+  18% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, 43px) scale(0.96);
+  }
+  88% {
+    opacity: 1;
+    transform: translate(-50%, 82px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 92px) scale(0.78);
+  }
+}
+
+@keyframes miniCarrierDown {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -2px) scale(0.78);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(-50%, 10px) scale(0.95);
+  }
+  38% {
+    transform: translate(-50%, 28px) scale(0.72);
+  }
+  58% {
+    transform: translate(-50%, 46px) scale(0.72);
+  }
+  86% {
+    opacity: 1;
+    transform: translate(-50%, 78px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 92px) scale(0.78);
+  }
+}
+
+@keyframes miniActiveUp {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.78);
+  }
+  18% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -38px) scale(0.96);
+  }
+  88% {
+    opacity: 1;
+    transform: translate(-50%, -78px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -90px) scale(0.78);
+  }
+}
+
+@keyframes miniActiveCarrierLeft {
+  0%,
+  100% {
+    transform-origin: 100% 100%;
+    transform: translate(-4px, -2px) rotate(-8deg) skewY(-4deg) scaleY(1.02);
+    border-radius: 24px 8px 12px 22px;
+  }
+  22%,
+  38%,
+  78% {
+    transform-origin: 100% 50%;
+    transform: translateX(0) rotate(0deg) scaleY(1);
+    border-radius: 22px 8px 8px 22px;
+  }
+  54%,
+  68% {
+    transform-origin: 100% 0;
+    transform: translate(-4px, 2px) rotate(8deg) skewY(5deg) scaleY(1.02);
+    border-radius: 18px 8px 24px 24px;
+  }
+  88% {
+    transform-origin: 100% 100%;
+    transform: translate(-2px, -1px) rotate(-5deg) skewY(-3deg) scaleY(1.01);
+    border-radius: 24px 8px 12px 22px;
+  }
+}
+
+@keyframes miniActiveCarrierRight {
+  0%,
+  100% {
+    transform-origin: 0 100%;
+    transform: translate(4px, -2px) rotate(8deg) skewY(4deg) scaleY(1.02);
+    border-radius: 8px 24px 22px 12px;
+  }
+  22%,
+  38%,
+  78% {
+    transform-origin: 0 50%;
+    transform: translateX(0) rotate(0deg) scaleY(1);
+    border-radius: 8px 22px 22px 8px;
+  }
+  54%,
+  68% {
+    transform-origin: 0 0;
+    transform: translate(4px, 2px) rotate(-8deg) skewY(-5deg) scaleY(1.02);
+    border-radius: 8px 18px 24px 24px;
+  }
+  88% {
+    transform-origin: 0 100%;
+    transform: translate(2px, -1px) rotate(5deg) skewY(3deg) scaleY(1.01);
+    border-radius: 8px 24px 22px 12px;
+  }
+}
+
+@keyframes miniAtpPulse {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-2px, -2px) scale(1.06);
+  }
 }
 
 .compare-row {
@@ -1052,11 +1305,114 @@ h1 {
   }
 }
 
+.topbar {
+  left: 50%;
+  right: auto;
+  width: min(1240px, calc(100vw - 64px));
+  align-items: center;
+  transform: translateX(-50%);
+}
+
+h1 {
+  max-width: none;
+  font-size: clamp(34px, 3.05vw, 48px);
+  line-height: 1.02;
+  white-space: nowrap;
+}
+
+.controls {
+  top: 114px;
+  width: min(1080px, calc(100vw - 96px));
+  padding: 9px;
+  gap: 9px;
+}
+
+.controls button {
+  min-height: 38px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.timeline {
+  gap: 9px;
+}
+
+.step {
+  min-height: 38px;
+  padding: 7px 10px;
+}
+
+.side {
+  left: 50%;
+  right: auto;
+  bottom: 20px;
+  width: min(1240px, calc(100vw - 64px));
+  max-height: none;
+  padding: 18px 20px;
+  transform: translateX(-50%);
+}
+
+.knowledge-body {
+  grid-template-columns: minmax(280px, 0.52fr) minmax(0, 1.48fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.side h2 {
+  margin: 6px 0 7px;
+  font-size: 24px;
+}
+
+.side p {
+  max-width: 34em;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.facts {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.facts div {
+  display: flex;
+  min-height: 86px;
+  padding: 13px 12px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.facts span,
+.facts b {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.facts b {
+  text-align: left;
+}
+
+.facts div:last-child {
+  grid-column: span 2;
+}
+
+.compare-panel {
+  left: 50%;
+  right: auto;
+  width: min(1120px, calc(100vw - 64px));
+  transform: translateX(-50%);
+}
+
 @media (max-width: 980px) {
   .topbar {
     top: 14px;
     left: 16px;
     right: 16px;
+    width: auto;
+    transform: none;
+    gap: 10px;
   }
 
   .eyebrow {
@@ -1064,15 +1420,18 @@ h1 {
   }
 
   h1 {
-    max-width: min(300px, calc(100vw - 148px));
-    font-size: clamp(22px, 7vw, 30px);
-    line-height: 1.08;
+    max-width: calc(100vw - 118px);
+    font-size: clamp(19px, 5.55vw, 29px);
+    line-height: 1.04;
+    white-space: nowrap;
+    overflow: visible;
   }
 
   .status {
-    min-width: 78px;
-    padding: 7px 10px;
-    font-size: 12px;
+    min-width: 70px;
+    padding: 6px 8px;
+    font-size: 11.5px;
+    white-space: nowrap;
   }
 
   .side {
@@ -1083,6 +1442,7 @@ h1 {
     width: auto;
     max-height: 228px;
     padding: 10px;
+    transform: none;
   }
 
   .knowledge-body {
@@ -1117,15 +1477,25 @@ h1 {
     gap: 5px;
   }
 
+  .facts div:last-child {
+    grid-column: span 2;
+  }
+
   .facts div {
+    display: grid;
     grid-template-columns: 62px minmax(0, 1fr);
     min-height: 28px;
     padding: 5px 7px;
+    gap: 6px;
   }
 
   .facts span,
   .facts b {
     font-size: 10.5px;
+  }
+
+  .facts b {
+    text-align: right;
   }
 
   .controls {
@@ -1185,6 +1555,7 @@ h1 {
   }
 
   .phospho-control {
+    left: auto;
     top: 198px;
     right: 12px;
     min-height: 34px;
@@ -1204,10 +1575,12 @@ h1 {
   .compare-panel {
     left: 14px;
     right: 14px;
+    width: auto;
     top: 246px;
-    max-height: calc(100vh - 440px);
+    max-height: calc(100vh - 290px);
     overflow: auto;
     padding: 14px;
+    transform: none;
   }
 
   .compare-visuals {
