@@ -389,7 +389,8 @@ h2 {
 }
 
 .compare-table {
-  overflow: hidden;
+  overflow: auto;
+  max-height: clamp(220px, calc(100vh - 560px), 330px);
   border: 1px solid rgba(43, 69, 91, 0.13);
   border-radius: 8px;
   background: rgba(250, 253, 253, 0.88);
@@ -400,6 +401,7 @@ h2 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 14px;
+  overflow-x: auto;
 }
 
 .mini-transport {
@@ -818,8 +820,15 @@ h2 {
 
 .compare-row {
   display: grid;
-  grid-template-columns: 92px 108px 94px 138px 104px minmax(230px, 1.45fr);
+  grid-template-columns: 108px 122px 108px 152px 116px minmax(280px, 1fr);
+  min-width: 900px;
   border-bottom: 1px solid rgba(43, 69, 91, 0.1);
+}
+
+.compare-row.compare-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
 }
 
 .compare-row:last-child {
@@ -840,9 +849,13 @@ h2 {
 }
 
 .compare-row span:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
   color: #1f2f46;
   font-weight: 820;
   background: rgba(237, 247, 251, 0.72);
+  box-shadow: 1px 0 0 rgba(43, 69, 91, 0.12);
 }
 
 .compare-header span {
@@ -851,14 +864,18 @@ h2 {
   background: linear-gradient(180deg, #eef8ff, #e8fbf7);
 }
 
+.compare-header span:first-child {
+  z-index: 4;
+}
+
 .protein-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  overflow: hidden;
   border: 1px solid rgba(43, 69, 91, 0.13);
   border-radius: 8px;
   background: rgba(250, 253, 253, 0.88);
+  table-layout: fixed;
 }
 
 .protein-table th,
@@ -873,10 +890,27 @@ h2 {
   vertical-align: top;
 }
 
+.protein-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
 .protein-table th {
   color: #1f2f46;
   font-weight: 840;
   background: #dff7ff;
+}
+
+.protein-table th:first-child {
+  width: 124px;
+}
+
+.protein-table th:nth-child(2),
+.protein-table th:nth-child(3),
+.protein-table td:nth-child(2),
+.protein-table td:nth-child(3) {
+  width: calc((100% - 124px) / 2);
 }
 
 .protein-table tbody th {
@@ -908,6 +942,8 @@ h2 {
   border: 1px solid rgba(15, 182, 163, 0.2);
   background: rgba(232, 251, 247, 0.72);
   color: #17334b;
+  font-size: 13px;
+  line-height: 1.55;
   font-weight: 760;
 }
 
@@ -1619,66 +1655,59 @@ h1 {
   }
 
   .compare-visuals {
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(clamp(78px, 27vw, 180px), 1fr));
+    gap: clamp(5px, 1.8vw, 8px);
+    padding-bottom: 4px;
+    overflow-x: auto;
   }
 
   .mini-transport {
-    display: grid;
-    grid-template-columns: minmax(76px, 0.42fr) minmax(150px, 1fr);
-    grid-template-rows: auto auto;
-    gap: 4px 8px;
-    padding: 9px;
+    padding: clamp(6px, 2vw, 9px);
   }
 
   .mini-transport h3 {
-    grid-column: 1;
-    margin: 0;
-    font-size: 14px;
+    margin: 0 0 5px;
+    font-size: clamp(11px, 3.2vw, 14px);
+    text-align: center;
   }
 
   .mini-transport p {
-    grid-column: 1;
-    margin: 0;
-    font-size: 11.5px;
-    line-height: 1.4;
+    margin: 6px 0 0;
+    font-size: clamp(9.5px, 2.7vw, 11.5px);
+    line-height: 1.35;
   }
 
   .mini-scene {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    height: 82px;
+    height: clamp(66px, 22vw, 82px);
   }
 
   .compare-table {
-    display: grid;
-    gap: 8px;
-    overflow: visible;
-    border: 0;
-    background: transparent;
-    min-width: 0;
+    overflow: auto;
+    max-height: 260px;
+    border: 2px solid rgba(32, 50, 74, 0.18);
+    background: rgba(250, 253, 253, 0.88);
   }
 
   .compare-row {
     display: grid;
-    grid-template-columns: 1fr;
-    overflow: hidden;
-    border: 2px solid rgba(32, 50, 74, 0.18);
-    border-radius: 8px;
-    background: #fffdf7;
+    grid-template-columns: 92px 104px 92px 126px 96px minmax(230px, 1fr);
+    min-width: 740px;
+    border: 0;
+    border-bottom: 1px solid rgba(43, 69, 91, 0.1);
+    border-radius: 0;
   }
 
   .compare-row.compare-header {
-    display: none;
+    position: static;
+    top: auto;
+    z-index: auto;
   }
 
   .compare-row span {
-    display: grid;
-    grid-template-columns: 84px minmax(0, 1fr);
     min-height: 0;
     padding: 8px 10px;
-    border-right: 0;
-    border-bottom: 1px solid rgba(43, 69, 91, 0.1);
+    border-right: 1px solid rgba(43, 69, 91, 0.1);
+    border-bottom: 0;
     font-size: 12px;
     line-height: 1.42;
   }
@@ -1688,37 +1717,17 @@ h1 {
   }
 
   .compare-row span:first-child {
-    display: block;
-    padding: 9px 10px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
     color: #1f2f46;
-    font-size: 15px;
-    font-weight: 860;
+    font-size: 12px;
+    font-weight: 820;
     background: #dff7ff;
   }
 
-  .compare-row span:not(:first-child)::before {
-    color: #536879;
-    font-weight: 820;
-  }
-
-  .compare-row span:nth-child(2)::before {
-    content: "浓度梯度";
-  }
-
-  .compare-row span:nth-child(3)::before {
-    content: "转运蛋白";
-  }
-
-  .compare-row span:nth-child(4)::before {
-    content: "蛋白种类";
-  }
-
-  .compare-row span:nth-child(5)::before {
-    content: "能量消耗";
-  }
-
-  .compare-row span:nth-child(6)::before {
-    content: "运输实例";
+  .compare-header span:first-child {
+    z-index: 3;
   }
 
   .protein-table,
@@ -1727,56 +1736,52 @@ h1 {
   .protein-table tr,
   .protein-table th,
   .protein-table td {
-    display: block;
+    display: revert;
   }
 
   .protein-table {
-    border: 0;
-    background: transparent;
+    display: table;
+    width: 100%;
+    min-width: 620px;
+    border: 2px solid rgba(32, 50, 74, 0.18);
+    background: rgba(250, 253, 253, 0.88);
+    table-layout: fixed;
   }
 
   .protein-table thead {
-    display: none;
+    display: table-header-group;
+  }
+
+  .protein-table tbody {
+    display: table-row-group;
   }
 
   .protein-table tr {
-    overflow: hidden;
-    margin-bottom: 8px;
-    border: 2px solid rgba(32, 50, 74, 0.18);
-    border-radius: 8px;
-    background: #fffdf7;
+    display: table-row;
+    margin-bottom: 0;
+    border: 0;
+    border-radius: 0;
   }
 
   .protein-table tbody th {
-    width: auto;
+    display: table-cell;
+    width: 108px;
     padding: 9px 10px;
-    border-right: 0;
+    border-right: 1px solid rgba(43, 69, 91, 0.12);
     color: #1f2f46;
-    font-size: 15px;
+    font-size: 12px;
     background: #dff7ff;
   }
 
   .protein-table td {
-    display: grid;
-    grid-template-columns: 74px minmax(0, 1fr);
-    gap: 8px;
     padding: 8px 10px;
-    border-right: 0;
+    border-right: 1px solid rgba(43, 69, 91, 0.12);
     font-size: 12px;
     line-height: 1.42;
   }
 
-  .protein-table td::before {
-    color: #536879;
-    font-weight: 820;
-  }
-
-  .protein-table td:nth-child(2)::before {
-    content: "通道蛋白";
-  }
-
-  .protein-table td:nth-child(3)::before {
-    content: "载体蛋白";
+  .protein-panel {
+    overflow: auto;
   }
 
   .protein-common {

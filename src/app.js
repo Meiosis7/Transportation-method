@@ -351,8 +351,8 @@ function zoneLabel(text, x, y, color) {
 
 function drawConcentrationParticles(time, mode) {
   const topMany = true;
-  const topCount = topMany ? 22 : 7;
-  const bottomCount = topMany ? 7 : 22;
+  const topCount = mode.id === 'facilitated' ? 28 : (topMany ? 22 : 7);
+  const bottomCount = mode.id === 'active' ? 5 : (topMany ? 7 : 22);
   drawStaticParticles(topCount, 120, 126, 570, 130, time, 1, mode);
   const clearZone = mode.id === 'active' && showPhosphorylation
     ? { x: 330, y: 365, w: 285, h: 160 }
