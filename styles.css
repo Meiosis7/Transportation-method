@@ -1094,6 +1094,33 @@ h2 {
     background 150ms ease;
 }
 
+#playBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#playBtn::before {
+  content: "";
+  display: block;
+}
+
+#playBtn[data-state="pause"]::before {
+  width: 9px;
+  height: 13px;
+  border-left: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+}
+
+#playBtn[data-state="play"]::before {
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 12px solid currentColor;
+}
+
 .controls button::after {
   content: "";
   position: absolute;
@@ -1719,42 +1746,38 @@ h1 {
   }
 
   .controls {
-    left: 6px;
-    right: 6px;
+    left: 8px;
+    right: 8px;
     top: 84px;
     bottom: auto;
     width: auto;
     min-width: 0;
     transform: none;
-    display: flex;
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "timeline timeline timeline"
+      "play compare protein";
     align-items: center;
-    gap: 3px;
-    padding: 4px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .controls::-webkit-scrollbar {
-    display: none;
+    gap: 6px;
+    padding: 7px;
+    overflow: visible;
   }
 
   #playBtn {
-    flex: 0 0 28px;
-    width: 28px;
-    min-height: 30px;
+    grid-area: play;
+    width: 34px;
+    min-height: 34px;
     padding: 0;
-    font-size: 14px;
     line-height: 1;
   }
 
   #compareBtn {
-    flex: 0 0 61px;
+    grid-area: compare;
   }
 
   #proteinBtn {
-    flex: 0 0 61px;
+    grid-area: protein;
   }
 
   #resetBtn {
@@ -1762,16 +1785,17 @@ h1 {
   }
 
   .timeline {
-    flex: 0 0 auto;
+    grid-area: timeline;
     display: flex;
-    gap: 3px;
+    gap: 6px;
+    min-width: 0;
   }
 
   .step {
-    flex: 0 0 43px;
-    min-height: 30px;
-    padding: 4px 2px;
-    font-size: 9.5px;
+    flex: 1 1 0;
+    min-height: 34px;
+    padding: 5px 4px;
+    font-size: 11px;
     white-space: nowrap;
   }
 
@@ -1782,9 +1806,9 @@ h1 {
   }
 
   .controls button {
-    min-height: 30px;
-    padding: 4px 1px;
-    font-size: 9.5px;
+    min-height: 34px;
+    padding: 5px 4px;
+    font-size: 11px;
     line-height: 1.18;
     white-space: nowrap;
     overflow-wrap: normal;

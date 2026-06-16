@@ -139,7 +139,8 @@ function setFactLines(element, lines) {
 }
 
 function updatePlayButton() {
-  playBtn.textContent = animation.playing ? '⏸' : '▶';
+  playBtn.textContent = '';
+  playBtn.dataset.state = animation.playing ? 'pause' : 'play';
   playBtn.setAttribute('aria-label', animation.playing ? '暂停' : '播放');
   playBtn.setAttribute('aria-pressed', String(animation.playing));
 }
