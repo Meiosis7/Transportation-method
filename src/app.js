@@ -1218,6 +1218,7 @@ function label(text, x, y, color) {
   ctx.arc(x, y - 5, 4, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = colors.ink;
+  ctx.font = '860 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
   ctx.fillText(text, x + 10, y);
   ctx.restore();
   addHit(text, x + width / 2 - 2, y - 5, width / 2, 18, 'rect');
