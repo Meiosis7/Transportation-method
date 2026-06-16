@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>物质跨膜运输方式交互动态模型</title>
+    <link rel="icon" href="data:," />
     <link rel="stylesheet" href="./styles.css?v=20260611172000" />
   </head>
   <body>
@@ -13,18 +14,17 @@
 
         <header class="topbar">
           <div>
-            <p class="eyebrow">高中生物 · 物质的跨膜运输方式</p>
+            <p class="eyebrow">必修1 · 物质的跨膜运输方式</p>
             <h1>物质跨膜运输动态模型</h1>
           </div>
-          <div class="status" id="status">自由扩散</div>
+          <div class="status" id="status">一生儿·《高中生物一本通》</div>
         </header>
 
         <nav class="controls floating-panel" aria-label="动画控制">
-          <button id="playBtn" type="button" aria-pressed="true">暂停</button>
+          <button id="playBtn" type="button" aria-pressed="true" aria-label="暂停">⏸</button>
           <div class="timeline" id="timeline"></div>
           <button id="compareBtn" type="button">运输方式对比</button>
           <button id="proteinBtn" type="button">转运蛋白对比</button>
-          <button id="resetBtn" type="button">重播</button>
         </nav>
         <button id="phosphoBtn" class="phospho-control floating-panel" type="button" aria-pressed="false" hidden>
           磷酸化过程
@@ -43,15 +43,18 @@
               <div><span>转运蛋白</span><b id="proteinFact">不需要</b></div>
               <div><span>蛋白种类</span><b id="typeFact">无</b></div>
               <div><span>能量消耗</span><b id="energyFact">不消耗 ATP</b></div>
-              <div><span>运输实例</span><b id="exampleFact">气体分子；小部分水；小分子脂溶性物质</b></div>
+              <div><span>运输实例</span><b id="exampleFact">气体分子；小部分水；甘油；小分子脂溶性物质</b></div>
             </div>
           </div>
         </aside>
 
         <div class="floating-info floating-panel" id="infoCard" hidden>
-          <button id="closeInfoBtn" type="button" aria-label="关闭说明">×</button>
-          <div class="section-title" id="infoCardTitle">说明</div>
-          <p id="infoText">点击膜上的结构或左右两侧浓度区，可以查看浓度梯度、转运蛋白和能量消耗说明。</p>
+          <img class="guide-avatar" src="./assets/guide-avatar.jpeg" alt="讲解头像" />
+          <div class="guide-bubble">
+            <button id="closeInfoBtn" type="button" aria-label="关闭说明">×</button>
+            <div class="section-title" id="infoCardTitle">说明</div>
+            <p id="infoText">点击膜上的结构或左右两侧浓度区，可以查看浓度梯度、转运蛋白和能量消耗说明。</p>
+          </div>
         </div>
 
         <section class="compare-panel floating-panel" id="comparePanel" aria-label="三种运输方式对比" hidden>
@@ -117,15 +120,15 @@
               <span>不需要</span>
               <span>无</span>
               <span>不消耗 ATP</span>
-              <span>气体分子：O₂、CO₂、N₂；小部分水；小分子脂溶性物质：甘油、乙醇、苯、胆固醇、性激素</span>
+              <span>气体分子：O₂、CO₂、N₂；小部分水；甘油；小分子脂溶性物质：乙醇、苯、胆固醇、性激素</span>
             </div>
             <div class="compare-row" role="row">
               <span>协助扩散</span>
               <span>顺浓度梯度</span>
               <span>需要</span>
-              <span>通道蛋白 / 载体蛋白</span>
+              <span>通道蛋白、载体蛋白</span>
               <span>不消耗 ATP</span>
-              <span>葡萄糖进入多数组织细胞；水通道；Na⁺、K⁺、Ca²⁺、Cl⁻ 离子通道</span>
+              <span>葡萄糖进入多数组织细胞；水通道；Na⁺、K⁺、Ca²⁺、Cl⁻ 通道</span>
             </div>
             <div class="compare-row" role="row">
               <span>主动运输</span>
@@ -133,7 +136,7 @@
               <span>需要</span>
               <span>载体蛋白</span>
               <span>消耗 ATP</span>
-              <span>植物根吸收无机盐离子；钠钾泵吸钾排钠；小肠、肾小管上皮细胞吸葡萄糖</span>
+              <span>植物根吸收无机盐离子；钠钾泵吸钾排钠；小肠、肾小管上皮细胞吸收葡萄糖</span>
             </div>
           </div>
         </section>
@@ -190,6 +193,6 @@
       </section>
     </main>
 
-    <script src="./src/app.js?v=20260611172000"></script>
+    <script type="module" src="./src/app.js?v=20260616184500"></script>
   </body>
 </html>

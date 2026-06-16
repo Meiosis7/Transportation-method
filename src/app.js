@@ -1,3 +1,6 @@
+import { advanceAnimation, createAnimationState, resetAnimation } from './core/animationState.js';
+import { colors, info, modes } from './data/modelData.js';
+
 const canvas = document.querySelector('#scene');
 const ctx = canvas.getContext('2d');
 const statusEl = document.querySelector('#status');
@@ -23,94 +26,14 @@ const proteinBtn = document.querySelector('#proteinBtn');
 const closeProteinBtn = document.querySelector('#closeProteinBtn');
 const proteinPanel = document.querySelector('#proteinPanel');
 const knowledgePanel = document.querySelector('#knowledgePanel');
-
-const modes = [
-  {
-    id: 'free',
-    title: '自由扩散',
-    short: '自由扩散',
-    text: '小分子或脂溶性物质直接穿过磷脂双分子层，从高浓度一侧向低浓度一侧扩散。',
-    focus: '不需要转运蛋白',
-    gradient: '顺浓度梯度',
-    protein: '不需要',
-    proteinType: '无',
-    energy: '不消耗 ATP',
-    examples: '气体分子：O₂、CO₂、N₂；小部分水；小分子脂溶性物质：甘油、乙醇、苯、胆固醇、性激素',
-    color: '#2f8cff',
-    direction: 'down',
-    transporter: 'none',
-  },
-  {
-    id: 'facilitated',
-    title: '协助扩散',
-    short: '协助扩散',
-    text: '离子或较大的极性分子需要通道蛋白或载体蛋白协助，仍然从高浓度流向低浓度。',
-    focus: '需要通道蛋白或载体蛋白',
-    gradient: '顺浓度梯度',
-    protein: '需要',
-    proteinType: '通道蛋白 / 载体蛋白',
-    energy: '不消耗 ATP',
-    examples: '葡萄糖进入多数组织细胞；水通道；Na⁺、K⁺、Ca²⁺、Cl⁻ 离子通道',
-    color: '#14b8a6',
-    direction: 'down',
-    transporter: 'channel',
-  },
-  {
-    id: 'active',
-    title: '主动运输',
-    short: '主动运输',
-    text: '物质通过载体蛋白逆浓度梯度运输，需要细胞提供 ATP 能量。',
-    focus: '需要载体蛋白',
-    gradient: '逆浓度梯度',
-    protein: '需要',
-    proteinType: '载体蛋白',
-    energy: '消耗 ATP',
-    examples: '植物根吸收无机盐离子；钠钾泵吸钾排钠；小肠、肾小管上皮细胞吸葡萄糖',
-    color: '#ed5f82',
-    direction: 'up',
-    transporter: 'activeCarrier',
-  },
-];
-
-const info = {
-  '高浓度区': '粒子数量多的一侧代表高浓度。自由扩散和协助扩散都朝低浓度区移动；主动运输则可以把物质运向高浓度区。',
-  '低浓度区': '粒子数量少的一侧代表低浓度。顺浓度梯度运输不需要细胞额外供能，逆浓度梯度运输需要能量。',
-  '磷脂双分子层': '细胞膜的基本骨架。小分子、脂溶性物质可直接通过；大分子或带电粒子通常不能直接穿过。',
-  '自由扩散路径': '自由扩散不经过转运蛋白，物质直接穿过磷脂双分子层，方向总是顺浓度梯度。',
-  '通道蛋白': '通道蛋白形成亲水通道，常帮助离子或水分子快速通过，属于协助扩散，不消耗 ATP。',
-  '载体蛋白': '载体蛋白有特定结合位点。被运输分子先与一侧结合位点结合，随后载体蛋白构象改变，另一侧形成出口并释放分子。',
-  '主动运输载体': '主动运输中的载体蛋白利用 ATP 水解释放的能量，把物质逆浓度梯度运输。',
-  ATP: 'ATP 提供主动运输所需能量。自由扩散和协助扩散不需要 ATP 直接供能。',
-};
-
-const colors = {
-  ink: '#233548',
-  muted: '#6e7f8f',
-  membraneA: '#ffd36f',
-  membraneB: '#f7a64a',
-  tail: 'rgba(74, 96, 116, 0.32)',
-  outside: 'rgba(232, 248, 255, 0.82)',
-  inside: 'rgba(238, 255, 244, 0.82)',
-  particle: '#f5a524',
-  particleAlt: '#ffe07d',
-  channel: '#2f8cff',
-  carrier: '#14b8a6',
-  atp: '#ed5f82',
-};
+const stage = document.querySelector('.stage');
 
 const hitAreas = [];
-let playing = true;
-let activeMode = 0;
-let phase = 0;
-let flowPhase = 0;
-let facilitatedFlowPhase = 0;
-let carrierPhase = 0;
-let activeCarrierPhase = 0;
-let activeProteinPhase = 0;
+const animation = createAnimationState();
 let lastTime = performance.now();
 let pixelRatio = 1;
 let sceneBox = { x: 0, y: 0, scale: 1 };
-let showPhosphorylation = false;
+let lastInfoPoint = null;
 
 buildControls();
 resize();
@@ -123,15 +46,10 @@ function buildControls() {
     button.type = 'button';
     button.textContent = mode.short;
     button.addEventListener('click', () => {
-      activeMode = index;
-      phase = 0;
-      flowPhase = 0;
-      facilitatedFlowPhase = 0;
-      carrierPhase = 0;
-      activeCarrierPhase = 0;
-      activeProteinPhase = 0;
-      playing = true;
+      animation.activeMode = index;
+      resetAnimation(animation);
       hideInfoCard();
+      hideOverlayPanels();
       syncPanel();
       updatePlayButton();
     });
@@ -139,29 +57,20 @@ function buildControls() {
   });
 
   playBtn.addEventListener('click', () => {
-    playing = !playing;
+    animation.playing = !animation.playing;
     updatePlayButton();
   });
 
-  resetBtn.addEventListener('click', () => {
-    phase = 0;
-    flowPhase = 0;
-    facilitatedFlowPhase = 0;
-    carrierPhase = 0;
-    activeCarrierPhase = 0;
-    activeProteinPhase = 0;
-    playing = true;
+  resetBtn?.addEventListener('click', () => {
+    resetAnimation(animation);
     hideInfoCard();
     syncPanel();
     updatePlayButton();
   });
 
   phosphoBtn.addEventListener('click', () => {
-    showPhosphorylation = !showPhosphorylation;
-    phase = 0;
-    activeCarrierPhase = 0;
-    activeProteinPhase = 0;
-    playing = true;
+    animation.showPhosphorylation = !animation.showPhosphorylation;
+    resetAnimation(animation);
     hideInfoCard();
     syncPanel();
     updatePlayButton();
@@ -169,21 +78,19 @@ function buildControls() {
   });
 
   compareBtn.addEventListener('click', () => {
-    comparePanel.hidden = false;
-    proteinPanel.hidden = true;
+    showOverlayPanel(comparePanel);
   });
 
   closeCompareBtn.addEventListener('click', () => {
-    comparePanel.hidden = true;
+    hideOverlayPanels();
   });
 
   proteinBtn.addEventListener('click', () => {
-    proteinPanel.hidden = false;
-    comparePanel.hidden = true;
+    showOverlayPanel(proteinPanel);
   });
 
   closeProteinBtn.addEventListener('click', () => {
-    proteinPanel.hidden = true;
+    hideOverlayPanels();
   });
 
   closeInfoBtn.addEventListener('click', (event) => {
@@ -199,49 +106,47 @@ function buildControls() {
 function tick(now) {
   const delta = Math.min(0.05, (now - lastTime) / 1000);
   lastTime = now;
-
-  if (playing) {
-    phase = (phase + delta * 0.12) % 1;
-    flowPhase = (flowPhase + delta * 0.13) % 1;
-    facilitatedFlowPhase = (facilitatedFlowPhase + delta * 0.24) % 1;
-    carrierPhase = (carrierPhase + delta * 0.38) % 1;
-    activeCarrierPhase = (activeCarrierPhase + delta * 0.36) % 1;
-    activeProteinPhase = activeCarrierPhase;
-    if (phase >= 1) {
-      phase %= 1;
-    }
-  }
+  advanceAnimation(animation, delta);
 
   draw(now / 1000);
   requestAnimationFrame(tick);
 }
 
 function syncPanel() {
-  const mode = modes[activeMode];
-  statusEl.textContent = mode.title;
+  const mode = modes[animation.activeMode];
   modeTitle.textContent = mode.title;
   modeText.textContent = mode.text;
   gradientFact.textContent = mode.gradient;
   proteinFact.textContent = mode.protein;
-  typeFact.textContent = mode.proteinType;
+  setFactLines(typeFact, mode.proteinTypeLines || [mode.proteinType]);
   energyFact.textContent = mode.energy;
-  exampleFact.textContent = mode.examples;
+  setFactLines(exampleFact, mode.exampleLines || [mode.examples]);
 
   document.querySelectorAll('.step').forEach((button, index) => {
-    button.classList.toggle('active', index === activeMode);
+    button.classList.toggle('active', index === animation.activeMode);
   });
   phosphoBtn.hidden = mode.id !== 'active';
   updatePhosphoButton();
 }
 
+function setFactLines(element, lines) {
+  element.replaceChildren();
+  lines.forEach((line) => {
+    const span = document.createElement('span');
+    span.textContent = line;
+    element.append(span);
+  });
+}
+
 function updatePlayButton() {
-  playBtn.textContent = playing ? '暂停' : '播放';
-  playBtn.setAttribute('aria-pressed', String(playing));
+  playBtn.textContent = animation.playing ? '⏸' : '▶';
+  playBtn.setAttribute('aria-label', animation.playing ? '暂停' : '播放');
+  playBtn.setAttribute('aria-pressed', String(animation.playing));
 }
 
 function updatePhosphoButton() {
-  phosphoBtn.classList.toggle('active-toggle', showPhosphorylation);
-  phosphoBtn.setAttribute('aria-pressed', String(showPhosphorylation));
+  phosphoBtn.classList.toggle('active-toggle', animation.showPhosphorylation);
+  phosphoBtn.setAttribute('aria-pressed', String(animation.showPhosphorylation));
 }
 
 function draw(time) {
@@ -272,13 +177,14 @@ function draw(time) {
   ctx.scale(scale, scale);
   drawScene(time);
   ctx.restore();
+  positionPhosphoButton();
 }
 
 function drawScene(time) {
-  const mode = modes[activeMode];
+  const mode = modes[animation.activeMode];
   drawGradientZones(mode);
   drawConcentrationParticles(time, mode);
-  drawMembrane(time);
+  drawMembrane(time, mode);
   drawTransporter(time, mode);
   drawMovingParticles(time, mode);
   drawEnergy(time, mode);
@@ -335,8 +241,19 @@ function drawGradientArrow(mode) {
   ctx.lineTo(x + 12, y2 - arrow * 2);
   ctx.closePath();
   ctx.fill();
-  ctx.font = '800 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  ctx.font = '900 22px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
   ctx.textAlign = 'right';
+  const textWidth = ctx.measureText(mode.gradient).width;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+  roundRect(742 - textWidth - 14, 296, textWidth + 24, 34, 8);
+  ctx.fill();
+  ctx.strokeStyle = hexToRgb(color.replace('#', ''), 0.26);
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.lineWidth = 5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.94)';
+  ctx.fillStyle = color;
+  ctx.strokeText(mode.gradient, 742, 318);
   ctx.fillText(mode.gradient, 742, 318);
   ctx.restore();
 }
@@ -354,7 +271,7 @@ function drawConcentrationParticles(time, mode) {
   const topCount = mode.id === 'facilitated' ? 28 : (topMany ? 22 : 7);
   const bottomCount = mode.id === 'active' ? 5 : (topMany ? 7 : 22);
   drawStaticParticles(topCount, 120, 126, 570, 130, time, 1, mode);
-  const clearZone = mode.id === 'active' && showPhosphorylation
+  const clearZone = mode.id === 'active' && animation.showPhosphorylation
     ? { x: 330, y: 365, w: 285, h: 160 }
     : null;
   drawStaticParticles(bottomCount, 122, 404, 570, 122, time, 9, mode, clearZone);
@@ -380,12 +297,12 @@ function drawStaticParticles(count, x, y, w, h, time, seed, mode, clearZone = nu
   }
 }
 
-function drawMembrane(time) {
+function drawMembrane(time, mode) {
   ctx.save();
   ctx.translate(58, 288);
 
-  drawPhospholipidLeaflet(0, 1, time);
-  drawPhospholipidLeaflet(104, -1, time + 4.2);
+  drawPhospholipidLeaflet(0, 1, time, mode);
+  drawPhospholipidLeaflet(104, -1, time + 4.2, mode);
 
   ctx.save();
   ctx.strokeStyle = 'rgba(35, 53, 72, 0.1)';
@@ -402,9 +319,10 @@ function drawMembrane(time) {
   addHit('磷脂双分子层', 394, 340, 372, 88, 'rect');
 }
 
-function drawPhospholipidLeaflet(y, direction, time) {
+function drawPhospholipidLeaflet(y, direction, time, mode) {
   for (let i = 0; i < 27; i += 1) {
     const x = 20 + i * 25;
+    if (shouldSkipPhospholipid(x, mode)) continue;
     const lateral = Math.sin(time * 0.85 + i * 0.47) * 1.8;
     const vertical = Math.sin(time * 1.15 + i * 0.62) * 1.25;
     const tailSway = Math.sin(time * 1.55 + i * 0.54) * 3.4;
@@ -447,6 +365,18 @@ function drawPhospholipidLeaflet(y, direction, time) {
   }
 }
 
+function shouldSkipPhospholipid(x, mode) {
+  if (mode.id === 'facilitated') {
+    return (x >= 270 && x <= 320) || (x >= 420 && x <= 470);
+  }
+
+  if (mode.id === 'active') {
+    return x >= 310 && x <= 385;
+  }
+
+  return false;
+}
+
 function drawTransporter(time, mode) {
   if (mode.transporter === 'none') {
     drawFreeDiffusionWindow(time, mode);
@@ -482,20 +412,57 @@ function drawChannelProtein(time, mode) {
   const x = 350;
   ctx.save();
   ctx.translate(x, 282);
-  ctx.fillStyle = colors.ink;
-  roundRect(-38, -8, 76, 128, 8);
+
+  const poreGrad = ctx.createLinearGradient(0, -12, 0, 136);
+  poreGrad.addColorStop(0, 'rgba(235, 252, 255, 0.98)');
+  poreGrad.addColorStop(0.5, 'rgba(218, 247, 250, 0.96)');
+  poreGrad.addColorStop(1, 'rgba(232, 255, 245, 0.98)');
+  ctx.fillStyle = poreGrad;
+  roundRect(-32, -12, 64, 148, 10);
   ctx.fill();
+
   const grad = ctx.createLinearGradient(-34, 0, 34, 120);
   grad.addColorStop(0, '#80c8ff');
+  grad.addColorStop(0.35, '#4fc0e8');
+  grad.addColorStop(0.72, '#18b9b0');
   grad.addColorStop(1, mode.color);
-  ctx.fillStyle = grad;
-  roundRect(-31, -2, 62, 116, 8);
+
+  ctx.fillStyle = 'rgba(232, 255, 252, 0.96)';
+  roundRect(-8, -10, 16, 144, 8);
   ctx.fill();
-  ctx.fillStyle = 'rgba(235, 250, 255, 0.95)';
-  roundRect(-13, 9, 26, 92, 8);
-  ctx.fill();
+
+  drawChannelLeaf(-1, grad);
+  drawChannelLeaf(1, grad);
+
+  ctx.strokeStyle = hexToRgb(mode.color.replace('#', ''), 0.5);
+  ctx.lineWidth = 3;
+  ctx.setLineDash([8, 8]);
+  ctx.beginPath();
+  ctx.moveTo(0, -16);
+  ctx.lineTo(0, 136);
+  ctx.stroke();
+  ctx.setLineDash([]);
   ctx.restore();
-  addHit('通道蛋白', x, 344, 64, 96, 'rect');
+  addHit('通道蛋白', x, 344, 78, 116, 'rect');
+}
+
+function drawChannelLeaf(side, fillStyle) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(side * 9, 0);
+  ctx.bezierCurveTo(side * 13, 30, side * 13, 86, side * 9, 116);
+  ctx.bezierCurveTo(side * 22, 121, side * 31, 121, side * 36, 116);
+  ctx.bezierCurveTo(side * 43, 86, side * 43, 30, side * 36, 0);
+  ctx.bezierCurveTo(side * 30, -5, side * 20, -5, side * 9, 0);
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+  ctx.lineWidth = 4;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = colors.ink;
+  ctx.stroke();
+  ctx.restore();
 }
 
 function drawCarrierProtein(time, mode, x, state = { outerOpen: 0, innerOpen: 0, bound: 0 }) {
@@ -508,8 +475,7 @@ function drawCarrierProtein(time, mode, x, state = { outerOpen: 0, innerOpen: 0,
   ctx.translate(x, 344);
 
   drawCarrierLeaf(-1, topOpen, bottomOpen, color);
-  drawCarrierLeaf(1, topOpen, bottomOpen, color);
-  drawCarrierBindingSite(state, mode, topOpen, bottomOpen);
+  drawCarrierLeaf(1, topOpen, bottomOpen, color, getCarrierSiteLocal(state).y);
 
   if (state.bound) {
     const size = 9.2 + Math.sin((state.t || 0) * Math.PI) * 1.1;
@@ -522,27 +488,25 @@ function drawCarrierProtein(time, mode, x, state = { outerOpen: 0, innerOpen: 0,
 
 function getCarrierLeafPose(side, topOpen, bottomOpen) {
   const openBalance = topOpen - bottomOpen;
+  const easedBalance = Math.sin(openBalance * Math.PI * 0.5);
   return {
-    angle: side * openBalance * 0.2,
-    xShift: side * openBalance * 6,
+    angle: side * easedBalance * 0.14,
+    xShift: side * easedBalance * 4.5,
     yShift: 0,
   };
 }
 
-function drawCarrierLeaf(side, topOpen, bottomOpen, fillStyle) {
+function drawCarrierLeaf(side, topOpen, bottomOpen, fillStyle, notchY = null) {
   const { angle, xShift, yShift } = getCarrierLeafPose(side, topOpen, bottomOpen);
   ctx.save();
   ctx.translate(xShift, yShift);
   ctx.rotate(angle);
   ctx.beginPath();
-  ctx.moveTo(side * 10, -65);
-  ctx.bezierCurveTo(side * 37, -67, side * 48, -45, side * 43, -18);
-  ctx.bezierCurveTo(side * 40, -3, side * 28, 7, side * 23, 14);
-  ctx.bezierCurveTo(side * 37, 31, side * 34, 58, side * 12, 66);
-  ctx.bezierCurveTo(side * 2, 54, side * 6, 31, side * 8, 14);
-  ctx.bezierCurveTo(side * 9, 6, side * 12, 1, side * 16, -2);
-  ctx.bezierCurveTo(side * 10, -12, side * 5, -30, side * 7, -47);
-  ctx.bezierCurveTo(side * 8, -55, side * 9, -61, side * 10, -65);
+  if (side === 1 && notchY !== null) {
+    drawRightCarrierLeafPathWithNotch(notchY);
+  } else {
+    drawPlainCarrierLeafPath(side);
+  }
   ctx.closePath();
   ctx.fillStyle = fillStyle;
   ctx.fill();
@@ -554,46 +518,54 @@ function drawCarrierLeaf(side, topOpen, bottomOpen, fillStyle) {
   ctx.restore();
 }
 
-function drawCarrierBindingSite(state, mode, topOpen, bottomOpen) {
-  const siteSide = 1;
-  const site = getCarrierSiteLocal(state);
-  const { angle, xShift, yShift } = getCarrierLeafPose(siteSide, topOpen, bottomOpen);
+function drawPlainCarrierLeafPath(side) {
+  ctx.moveTo(side * 10, -65);
+  ctx.bezierCurveTo(side * 37, -67, side * 48, -45, side * 43, -18);
+  ctx.bezierCurveTo(side * 40, -3, side * 28, 7, side * 23, 14);
+  ctx.bezierCurveTo(side * 37, 31, side * 34, 58, side * 12, 66);
+  ctx.bezierCurveTo(side * 2, 54, side * 6, 31, side * 8, 14);
+  ctx.bezierCurveTo(side * 9, 6, side * 12, 1, side * 16, -2);
+  ctx.bezierCurveTo(side * 10, -12, side * 5, -30, side * 7, -47);
+  ctx.bezierCurveTo(side * 8, -55, side * 9, -61, side * 10, -65);
+}
 
-  ctx.save();
-  ctx.translate(xShift, yShift);
-  ctx.rotate(angle);
-  ctx.translate(site.x, site.y);
+function drawRightCarrierLeafPathWithNotch(notchY) {
+  ctx.moveTo(10, -65);
+  ctx.bezierCurveTo(37, -67, 48, -45, 43, -18);
+  ctx.bezierCurveTo(40, -3, 28, 7, 23, 14);
+  ctx.bezierCurveTo(37, 31, 34, 58, 12, 66);
 
-  ctx.save();
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.beginPath();
-  ctx.arc(-8, 0, 11, -Math.PI / 2, Math.PI / 2);
-  ctx.lineTo(-8, -11);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
+  if (notchY > 0) {
+    ctx.bezierCurveTo(4, 56, 7, notchY + 17, 9, notchY + 11);
+    drawRightLeafConcaveNotch(notchY);
+    ctx.bezierCurveTo(8, 25, 7, 18, 8, 14);
+    ctx.bezierCurveTo(9, 6, 12, 1, 16, -2);
+    ctx.bezierCurveTo(10, -12, 5, -30, 7, -47);
+  } else {
+    ctx.bezierCurveTo(2, 54, 6, 31, 8, 14);
+    ctx.bezierCurveTo(9, 6, 12, 1, 16, -2);
+    ctx.bezierCurveTo(11, -11, 9, notchY + 17, 9, notchY + 11);
+    drawRightLeafConcaveNotch(notchY);
+    ctx.bezierCurveTo(7, -47, 8, -55, 10, -65);
+    return;
+  }
 
-  ctx.strokeStyle = colors.ink;
-  ctx.lineWidth = 2.8;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.arc(-8, 0, 11, -Math.PI / 2, Math.PI / 2);
-  ctx.stroke();
+  ctx.bezierCurveTo(8, -55, 9, -61, 10, -65);
+}
 
-  ctx.strokeStyle = mode.id === 'active' ? colors.atp : mode.color;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.arc(-8, 0, 16, -Math.PI * 0.4, Math.PI * 0.4);
-  ctx.stroke();
-  ctx.restore();
+function drawRightLeafConcaveNotch(centerY) {
+  ctx.bezierCurveTo(14, centerY + 10, 18, centerY + 7, 19, centerY);
+  ctx.bezierCurveTo(18, centerY - 7, 14, centerY - 10, 9, centerY - 11);
 }
 
 function drawActiveCarrierProtein(time, mode) {
   const x = 400;
-  const transportPhase = showPhosphorylation ? activePhaseAfterPhosphorylation(activeCarrierPhase) : activeProteinPhase;
+  const transportPhase = animation.showPhosphorylation
+    ? activePhaseAfterPhosphorylation(animation.activeCarrierPhase)
+    : animation.activeProteinPhase;
   drawCarrierProtein(time, mode, x, getPumpState(transportPhase));
-  if (showPhosphorylation) {
-    drawPhosphorylationProcess(x, time, activeProteinPhase);
+  if (animation.showPhosphorylation) {
+    drawPhosphorylationProcess(x, time, animation.activeProteinPhase);
   } else {
     drawFixedAtpBadge(x + 96, 430, time);
     drawEnergyArrow(x + 54, 424, x + 14, 392, time);
@@ -801,9 +773,9 @@ function drawFixedAtpBadge(x, y, time) {
   ctx.font = '900 16px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('ATP', 0, -1);
-  ctx.font = '760 9px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-  ctx.fillText('供能', 0, 14);
+  ctx.fillText('ATP', 0, -3);
+  ctx.font = '900 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  ctx.fillText('供能', 0, 13);
   ctx.restore();
 }
 
@@ -835,15 +807,17 @@ function drawMovingParticles(time, mode) {
   }
 
   if (mode.id === 'active') {
-    drawCarrierQueues(time, mode, 400, 'bottom');
-    const transportPhase = showPhosphorylation ? activePhaseAfterPhosphorylation(activeCarrierPhase) : activeCarrierPhase;
+    drawCarrierQueues(time * 2.25, mode, 400, 'bottom');
+    const transportPhase = animation.showPhosphorylation
+      ? activePhaseAfterPhosphorylation(animation.activeCarrierPhase)
+      : animation.activeCarrierPhase;
     drawCarrierTransportParticle(mode, 400, 'bottom', transportPhase, 2);
     return;
   }
 
   const count = 6;
   for (let i = 0; i < count; i += 1) {
-    const offset = (flowPhase + i / count) % 1;
+    const offset = (animation.flowPhase + i / count) % 1;
     const eased = smoothstep(0.01, 0.99, offset);
     const path = getPath(mode, i);
     const point = pointOnPolyline(path, eased);
@@ -856,10 +830,10 @@ function drawMovingParticles(time, mode) {
 }
 
 function drawFacilitatedMovingParticles(time, mode) {
-  drawCarrierQueues(time, mode, 500, 'top');
+  drawCarrierQueues(time * 2.25, mode, 500, 'top');
 
   for (let i = 0; i < 4; i += 1) {
-    const offset = (facilitatedFlowPhase + i / 4) % 1;
+    const offset = (animation.facilitatedFlowPhase + i / 4) % 1;
     const eased = smoothstep(0.01, 0.99, offset);
     const path = getChannelPath(i);
     const point = pointOnPolyline(path, eased);
@@ -870,7 +844,7 @@ function drawFacilitatedMovingParticles(time, mode) {
     }
   }
 
-  drawCarrierTransportParticle(mode, 500, 'top', carrierPhase, 4);
+  drawCarrierTransportParticle(mode, 500, 'top', animation.carrierPhase, 4);
 }
 
 function drawCarrierTransportParticle(mode, x, entrySide, transportPhase, particleCount = 2) {
@@ -971,11 +945,11 @@ function getChannelPath(index) {
 
 function getCarrierState(mode) {
   if (mode.id !== 'facilitated') return { outerOpen: 0.18, innerOpen: 0.18, bound: 0 };
-  const t = carrierPhase % 1;
+  const t = animation.carrierPhase % 1;
   return carrierStateFor(t, false);
 }
 
-function getPumpState(phaseValue = activeProteinPhase) {
+function getPumpState(phaseValue = animation.activeProteinPhase) {
   const t = phaseValue % 1;
   const state = carrierStateFor(t, true);
   state.bound = 0;
@@ -1030,7 +1004,7 @@ function carrierBoundY(t) {
 function getCarrierSiteLocal(state) {
   const entryTop = state.entrySide !== 'bottom';
   return {
-    x: 15,
+    x: 18,
     y: entryTop ? -34 : 34,
   };
 }
@@ -1040,7 +1014,7 @@ function getCarrierSiteWorld(x, state) {
   const bottomOpen = Math.max(0, Math.min(1, state.innerOpen || 0));
   const siteSide = 1;
   const site = getCarrierSiteLocal(state);
-  const bindX = site.x - 8;
+  const bindX = site.x - 3;
   const { angle, xShift, yShift } = getCarrierLeafPose(siteSide, topOpen, bottomOpen);
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
@@ -1063,26 +1037,28 @@ function pointOnCarrierCycle(t, entrySide = 'top', x = 500) {
   const entry = { x: x - 32, y: entryTop ? 138 : 532 };
   const exit = { x: x + 32, y: entryTop ? 532 : 138 };
 
-  if (t < 0.2) {
-    const k = smoothstep(0.02, 0.2, t);
+  if (t < 0.24) {
+    const k = easeInOutCubic(smoothstep(0.02, 0.24, t));
     return {
       x: lerp(entry.x, site.x, k),
       y: lerp(entry.y, site.y, k),
-      bound: k > 0.82,
+      bound: k > 0.76,
       visible: true,
     };
   }
 
-  if (t < 0.62) {
+  if (t < 0.56) {
     return { x: site.x, y: site.y, bound: true, visible: true };
   }
 
-  if (t < 0.84) {
-    const k = smoothstep(0.62, 0.84, t);
+  if (t < 0.9) {
+    const releaseState = carrierStateFor(0.6, !entryTop);
+    const releaseSite = getCarrierSiteWorld(x, releaseState);
+    const k = easeInOutCubic(smoothstep(0.56, 0.9, t));
     return {
-      x: lerp(site.x, exit.x, k),
-      y: lerp(site.y, exit.y, k),
-      bound: k < 0.15,
+      x: lerp(releaseSite.x, exit.x, k),
+      y: lerp(releaseSite.y, exit.y, k),
+      bound: k < 0.2,
       visible: true,
     };
   }
@@ -1194,13 +1170,20 @@ function drawComparisonStrip(mode) {
 
 function drawLabels(mode) {
   label('磷脂双分子层', 76, 316, '#885311');
-  if (mode.id === 'free') label('直接通过膜', 416, 284, mode.color);
+  if (mode.id === 'free') {
+    label('直接通过膜', 416, 284, mode.color);
+    addHit('自由扩散路径', 368, 344, 36, 94, 'rect');
+  }
   if (mode.id === 'facilitated') {
-    label('通道蛋白', 382, 282, colors.channel);
+    label('通道', 382, 282, colors.channel);
     label('载体蛋白', 532, 282, colors.carrier);
+    addHit('通道蛋白', 350, 344, 78, 116, 'rect');
+    addHit('载体蛋白', 500, 344, 78, 104, 'rect');
   }
   if (mode.id === 'active') {
     label('载体蛋白', 430, 282, colors.atp);
+    addHit('主动运输载体', 400, 344, 76, 104, 'rect');
+    addHit('ATP', 512, 444, 68, 46, 'ellipse');
   }
 
   ctx.save();
@@ -1208,6 +1191,12 @@ function drawLabels(mode) {
   ctx.font = '760 15px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
   ctx.fillText('点击浓度区、膜结构或 ATP 查看说明', 76, 42);
   ctx.restore();
+
+  ctx.save();
+  ctx.font = '900 22px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  const gradientWidth = ctx.measureText(mode.gradient).width;
+  ctx.restore();
+  addHit(mode.gradient, 742 - gradientWidth / 2 - 2, 313, gradientWidth / 2 + 22, 26, 'rect');
 }
 
 function label(text, x, y, color) {
@@ -1264,11 +1253,12 @@ function pickStructure(clientX, clientY) {
 
   for (let i = hitAreas.length - 1; i >= 0; i -= 1) {
     const area = hitAreas[i];
+    const touchPad = window.innerWidth <= 980 ? 20 / sceneBox.scale : 0;
     if (area.type === 'ellipse') {
-      const dx = (x - area.x) / area.w;
-      const dy = (y - area.y) / area.h;
+      const dx = (x - area.x) / (area.w + touchPad);
+      const dy = (y - area.y) / (area.h + touchPad);
       if (dx * dx + dy * dy <= 1) return area.name;
-    } else if (Math.abs(x - area.x) <= area.w && Math.abs(y - area.y) <= area.h) {
+    } else if (Math.abs(x - area.x) <= area.w + touchPad && Math.abs(y - area.y) <= area.h + touchPad) {
       return area.name;
     }
   }
@@ -1276,25 +1266,53 @@ function pickStructure(clientX, clientY) {
 }
 
 function selectStructure(name) {
-  showInfoCard(name);
+  showInfoCard(name, null, null);
 }
 
 function showInfoCard(name, clientX = null, clientY = null) {
   const text = info[name];
   if (!text) return;
 
+  lastInfoPoint = Number.isFinite(clientX) && Number.isFinite(clientY)
+    ? { x: clientX, y: clientY }
+    : null;
   infoCardTitle.textContent = name;
   infoText.textContent = text;
   infoCard.hidden = false;
+  positionInfoCard(lastInfoPoint);
+}
+
+function positionInfoCard(point = lastInfoPoint) {
+  if (infoCard.hidden) return;
 
   const padding = 14;
-  const fallbackX = window.innerWidth * 0.5;
-  const fallbackY = window.innerHeight * 0.48;
-  const x = clientX ?? fallbackX;
-  const y = clientY ?? fallbackY;
   const rect = infoCard.getBoundingClientRect();
-  const left = Math.min(window.innerWidth - rect.width - padding, Math.max(padding, x + 18));
-  const top = Math.min(window.innerHeight - rect.height - padding, Math.max(padding, y + 18));
+  const isCompact = window.innerWidth <= 980;
+  let targetLeft;
+  let targetTop;
+
+  if (isCompact) {
+    const sceneBottom = sceneBox.y + 570 * sceneBox.scale;
+    const knowledgeTop = knowledgePanel.getBoundingClientRect().top;
+    const gapTop = sceneBottom + 10;
+    const gapBottom = knowledgeTop - rect.height - 10;
+    targetLeft = (window.innerWidth - rect.width) / 2;
+    targetTop = gapTop <= gapBottom ? gapTop : gapBottom;
+  } else if (point) {
+    const offsetX = 24;
+    const offsetY = 24;
+    const fitsRight = point.x + offsetX + rect.width <= window.innerWidth - padding;
+    const fitsAbove = point.y - rect.height - offsetY >= padding;
+    targetLeft = fitsRight ? point.x + offsetX : point.x - rect.width - offsetX;
+    targetTop = fitsAbove ? point.y - rect.height - offsetY : point.y + offsetY;
+  } else {
+    const sceneBottom = sceneBox.y + 570 * sceneBox.scale;
+    const knowledgeTop = knowledgePanel.getBoundingClientRect().top;
+    targetLeft = sceneBox.x + 410 * sceneBox.scale;
+    targetTop = Math.min(knowledgeTop - rect.height - 14, sceneBottom - rect.height - 18);
+  }
+  const left = Math.min(window.innerWidth - rect.width - padding, Math.max(padding, targetLeft));
+  const top = Math.min(window.innerHeight - rect.height - padding, Math.max(padding, targetTop));
 
   infoCard.style.left = `${left}px`;
   infoCard.style.top = `${top}px`;
@@ -1302,6 +1320,45 @@ function showInfoCard(name, clientX = null, clientY = null) {
 
 function hideInfoCard() {
   infoCard.hidden = true;
+  lastInfoPoint = null;
+}
+
+function showOverlayPanel(panel) {
+  comparePanel.hidden = panel !== comparePanel;
+  proteinPanel.hidden = panel !== proteinPanel;
+  hideInfoCard();
+  updateOverlayState();
+}
+
+function hideOverlayPanels() {
+  comparePanel.hidden = true;
+  proteinPanel.hidden = true;
+  updateOverlayState();
+}
+
+function updateOverlayState() {
+  const overlayOpen = !comparePanel.hidden || !proteinPanel.hidden;
+  stage.classList.toggle('overlay-open', overlayOpen);
+}
+
+function positionPhosphoButton() {
+  if (phosphoBtn.hidden) return;
+
+  const scale = sceneBox.scale || 1;
+  const rect = phosphoBtn.getBoundingClientRect();
+  const left = Math.min(
+    window.innerWidth - rect.width - 12,
+    Math.max(12, sceneBox.x + 714 * scale - rect.width - 18 * scale),
+  );
+  const top = Math.min(
+    window.innerHeight - rect.height - 12,
+    Math.max(12, sceneBox.y + 570 * scale - rect.height - (window.innerWidth <= 340 ? 18 : 54) * scale),
+  );
+
+  phosphoBtn.style.left = `${left}px`;
+  phosphoBtn.style.top = `${top}px`;
+  phosphoBtn.style.right = 'auto';
+  positionInfoCard();
 }
 
 function resize() {
@@ -1329,6 +1386,17 @@ function pointOnPolyline(points, t) {
 function smoothstep(start, end, value) {
   const t = Math.max(0, Math.min(1, (value - start) / (end - start)));
   return t * t * (3 - 2 * t);
+}
+
+function easeInOutCubic(value) {
+  const t = Math.max(0, Math.min(1, value));
+  return t < 0.5 ? 4 * t * t * t : 1 - ((-2 * t + 2) ** 3) / 2;
+}
+
+function cubicBezier(a, b, c, d, t) {
+  const p = Math.max(0, Math.min(1, t));
+  const inv = 1 - p;
+  return inv * inv * inv * a + 3 * inv * inv * p * b + 3 * inv * p * p * c + p * p * p * d;
 }
 
 function lerp(a, b, t) {
