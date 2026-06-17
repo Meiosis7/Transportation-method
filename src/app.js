@@ -1176,7 +1176,7 @@ function drawLabels(mode) {
     addHit('自由扩散路径', 368, 344, 36, 94, 'rect');
   }
   if (mode.id === 'facilitated') {
-    label('通道', 382, 282, colors.channel);
+    label('通道蛋白', 382, 282, colors.channel);
     label('载体蛋白', 532, 282, colors.carrier);
     addHit('通道蛋白', 350, 344, 78, 116, 'rect');
     addHit('载体蛋白', 500, 344, 78, 104, 'rect');
@@ -1274,11 +1274,12 @@ function selectStructure(name) {
 function showInfoCard(name, clientX = null, clientY = null) {
   const text = info[name];
   if (!text) return;
+  const title = name === '主动运输载体' ? '载体蛋白' : name;
 
   lastInfoPoint = Number.isFinite(clientX) && Number.isFinite(clientY)
     ? { x: clientX, y: clientY }
     : null;
-  infoCardTitle.textContent = name;
+  infoCardTitle.textContent = title;
   infoText.textContent = text;
   infoCard.hidden = false;
   positionInfoCard(lastInfoPoint);
@@ -1348,13 +1349,15 @@ function positionPhosphoButton() {
 
   const scale = sceneBox.scale || 1;
   const rect = phosphoBtn.getBoundingClientRect();
+  const knowledgeTop = knowledgePanel.getBoundingClientRect().top;
+  const safeBottom = Math.min(window.innerHeight - 12, knowledgeTop - 12);
   const left = Math.min(
     window.innerWidth - rect.width - 12,
     Math.max(12, sceneBox.x + 714 * scale - rect.width - 18 * scale),
   );
   const top = Math.min(
-    window.innerHeight - rect.height - 12,
-    Math.max(12, sceneBox.y + 570 * scale - rect.height - (window.innerWidth <= 340 ? 18 : 54) * scale),
+    safeBottom - rect.height,
+    Math.max(12, sceneBox.y + 570 * scale - rect.height - 18 * scale),
   );
 
   phosphoBtn.style.left = `${left}px`;
